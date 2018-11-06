@@ -22,7 +22,7 @@ void main() {
     vec3 tc1 = texture2DRect(imgTex, uvAbs / imgScale - imgOffset).rgb;
     vec3 tc2 = texture2DRect(vidTex, uvAbs / vidScale).rgb;
     
-    vec3 tc = mix(tc1, tc2, tc1);
+    vec3 tc = mix(tc1 * tc2, tc2, tc1);
     
     gl_FragColor = vec4(tc, 1.0);
 }

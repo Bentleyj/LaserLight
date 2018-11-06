@@ -1,8 +1,8 @@
 <group>
-	<Image_Index>16</Image_Index>
+	<Image_Index>12</Image_Index>
 	<Video_Index>3</Video_Index>
 <group/>
-	<Image_Offset>-355.265, -250.776</Image_Offset>
+	<Image_Offset>-564.245, 125.388</Image_Offset>
 	<Img_Scale>0.255</Img_Scale>
 	<Vid_Scale>1</Vid_Scale>
 	<Show_Img>1</Show_Img>
