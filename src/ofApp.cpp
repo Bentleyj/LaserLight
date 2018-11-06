@@ -35,8 +35,7 @@ void ofApp::setup(){
     
     blend.load("shaders/blend");
     
-    videoIndex = 0;
-    imageIndex = 0;
+    videos[videoIndex]->play();
 }
 
 //--------------------------------------------------------------
