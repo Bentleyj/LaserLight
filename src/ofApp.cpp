@@ -19,9 +19,13 @@ void ofApp::setup(){
     
     string settingsPath = "settings/settings.xml";
     gui.setup("Controls", settingsPath);
-    gui.add(imageOffset.set("Image Offset", ofVec2f(0, 0), ofVec2f(-ofGetWidth(), -ofGetHeight()), ofVec2f(ofGetWidth(), ofGetHeight())));
+    gui.add(imageOffset.set("Image Offset", ofVec2f(0, 0), ofVec2f(-ofGetWidth()*2, -ofGetHeight()*2), ofVec2f(ofGetWidth()*2, ofGetHeight()*2)));
     gui.add(imageIndex.set("Image Index", 0, 0, images.size() - 1));
     gui.add(videoIndex.set("Video Index", 0, 0, videos.size() - 1));
+    gui.add(imgScale.set("Img Scale", 1, 0, 3));
+    gui.add(vidScale.set("Vid Scale", 1, 0, 3));
+    gui.add(showImg.set("Show Img", false));
+    gui.add(doMix.set("Do Mix", true));
 
     gui.loadFromFile(settingsPath);
     
@@ -42,15 +46,30 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    blend.begin();
-    blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
-    blend.setUniformTexture("vidTex", videos[videoIndex]->getTexture(), 1);
-    blend.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
-    blend.setUniform1f("imgScale", imgScale);
-    blend.setUniform1f("vidScale", vidScale);
-    blend.setUniform2f("imgOffset", imageOffset.get().x, imageOffset.get().y);
-    ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-    blend.end();
+    if(doMix) {
+        blend.begin();
+        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
+        blend.setUniformTexture("vidTex", videos[videoIndex]->getTexture(), 1);
+        blend.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+        blend.setUniform1f("imgScale", imgScale);
+        blend.setUniform1f("vidScale", vidScale);
+        blend.setUniform2f("imgOffset", imageOffset.get().x, imageOffset.get().y);
+        ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+        blend.end();
+    } else {
+        if(showImg) {
+            ofPushMatrix();
+            ofScale(imgScale, imgScale);
+            images[imageIndex]->draw();
+            ofPopMatrix();
+        } else {
+            ofPushMatrix();
+            ofScale(vidScale, vidScale);
+            videos[videoIndex]->draw();
+            ofPopMatrix();
+        }
+    }
+
     
     ofSetColor(255);
     gui.draw();
@@ -58,29 +77,11 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::onImageChanged(int & index) {
-    if(images[imageIndex]->baseWidth > images[imageIndex]->baseHeight) {
-//        imgScale =  ofGetWidth() / images[imageIndex]->baseWidth;
-        images[imageIndex]->drawWidth = images[imageIndex]->baseWidth * imgScale;
-        images[imageIndex]->drawHeight = images[imageIndex]->baseHeight * imgScale;
-    } else {
-//        imgScale =  ofGetHeight() / images[imageIndex]->baseHeight;
-        images[imageIndex]->drawWidth = images[imageIndex]->baseWidth * imgScale;
-        images[imageIndex]->drawHeight = images[imageIndex]->baseHeight * imgScale;
-    }
 
 }
 
 //--------------------------------------------------------------
 void ofApp::onVideoChanged(int & index) {
-    if(videos[videoIndex]->baseWidth > videos[videoIndex]->baseHeight) {
-//        vidScale =  ofGetWidth() / videos[videoIndex]->baseWidth;
-        videos[videoIndex]->drawWidth = videos[videoIndex]->baseWidth * vidScale;
-        videos[videoIndex]->drawHeight = videos[videoIndex]->baseHeight * vidScale;
-    } else {
-//        vidScale =  ofGetHeight() / videos[videoIndex]->baseWidth;
-        videos[videoIndex]->drawWidth = videos[videoIndex]->baseWidth * vidScale;
-        videos[videoIndex]->drawHeight = videos[videoIndex]->baseHeight * vidScale;
-    }
     for(int i = 0; i < videos.size(); i++) {
         videos[i]->stop();
     }

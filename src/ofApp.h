@@ -33,8 +33,10 @@ class ofApp : public ofBaseApp{
     vector<LaserImage*> images;
     vector<LaserVideo*> videos;
     
-    float vidScale;
-    float imgScale;
+    ofParameter<float> vidScale;
+    ofParameter<float> imgScale;
+    ofParameter<bool> showImg;
+    ofParameter<bool> doMix;
     
     ofxPanel gui;
     

@@ -8,7 +8,7 @@ uniform float vidScale;
 uniform vec2 imgOffset;
 
 float length(vec3 v) {
-    return (v.x + v.y + v.z) / 3.0;
+    return sqrt(v.x * v.x + v.y * v.y + v.x * v.z);
 }
 
 void main() {
@@ -22,7 +22,7 @@ void main() {
     vec3 tc1 = texture2DRect(imgTex, uvAbs / imgScale - imgOffset).rgb;
     vec3 tc2 = texture2DRect(vidTex, uvAbs / vidScale).rgb;
     
-    vec3 tc = tc1 * tc2;
+    vec3 tc = mix(tc1, tc2, tc2);
     
     gl_FragColor = vec4(tc, 1.0);
 }
