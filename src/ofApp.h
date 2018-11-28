@@ -37,6 +37,7 @@ class ofApp : public ofBaseApp{
     ofParameter<float> imgScale;
     ofParameter<bool> showImg;
     ofParameter<bool> doMix;
+    ofParameter<float> test;
     
     ofxPanel gui;
     

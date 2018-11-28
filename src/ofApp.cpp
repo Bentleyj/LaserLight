@@ -26,6 +26,7 @@ void ofApp::setup(){
     gui.add(vidScale.set("Vid Scale", 1, 0, 3));
     gui.add(showImg.set("Show Img", false));
     gui.add(doMix.set("Do Mix", true));
+    gui.add(test.set("Test", 0, 0, 1));
 
     gui.loadFromFile(settingsPath);
     
