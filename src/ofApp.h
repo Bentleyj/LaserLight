@@ -17,6 +17,7 @@ class ofApp : public ofBaseApp{
     void onImageChanged(int & index);
     void onVideoChanged(int & index);
     void onImageOffsetChanged(ofVec2f & offset);
+    void saveHotspots();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -33,11 +34,7 @@ class ofApp : public ofBaseApp{
     vector<LaserImage*> images;
     vector<LaserVideo*> videos;
     
-    ofParameter<float> vidScale;
-    ofParameter<float> imgScale;
-    ofParameter<bool> showImg;
-    ofParameter<bool> doMix;
-    ofParameter<float> test;
+    ofParameter<float> scale;
     
     ofxPanel gui;
     

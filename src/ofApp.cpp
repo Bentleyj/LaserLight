@@ -22,11 +22,7 @@ void ofApp::setup(){
     gui.add(imageOffset.set("Image Offset", ofVec2f(0, 0), ofVec2f(-ofGetWidth()*2, -ofGetHeight()*2), ofVec2f(ofGetWidth()*2, ofGetHeight()*2)));
     gui.add(imageIndex.set("Image Index", 0, 0, images.size() - 1));
     gui.add(videoIndex.set("Video Index", 0, 0, videos.size() - 1));
-    gui.add(imgScale.set("Img Scale", 1, 0, 3));
-    gui.add(vidScale.set("Vid Scale", 1, 0, 3));
-    gui.add(showImg.set("Show Img", false));
-    gui.add(doMix.set("Do Mix", true));
-    gui.add(test.set("Test", 0, 0, 1));
+    gui.add(scale.set("Scale", 1, 0, 3));
 
     gui.loadFromFile(settingsPath);
     
@@ -35,6 +31,13 @@ void ofApp::setup(){
     imageOffset.addListener(this, &ofApp::onImageOffsetChanged);
     
     blend.load("shaders/blend");
+    
+//    ofxXmlSettings settings;
+//    settings.load("settings.xml");
+//    settings.pushTag("videos");
+//    for(int i = 0; i < videos.size(); i++) {
+//        for(int i = 0; i < settings.get)
+//    }
     
     videos[videoIndex]->play();
 }
@@ -46,30 +49,36 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    if(doMix) {
-        blend.begin();
-        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
-        blend.setUniformTexture("vidTex", videos[videoIndex]->getTexture(), 1);
-        blend.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
-        blend.setUniform1f("imgScale", imgScale);
-        blend.setUniform1f("vidScale", vidScale);
-        blend.setUniform2f("imgOffset", imageOffset.get().x, imageOffset.get().y);
-        ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-        blend.end();
-    } else {
-        if(showImg) {
-            ofPushMatrix();
-            ofScale(imgScale, imgScale);
-            images[imageIndex]->draw();
-            ofPopMatrix();
-        } else {
-            ofPushMatrix();
-            ofScale(vidScale, vidScale);
-            videos[videoIndex]->draw();
-            ofPopMatrix();
-        }
-    }
-
+    ofPushMatrix();
+    ofScale(scale, scale);
+    ofTranslate(0, 0);
+    images[imageIndex]->draw();
+    ofTranslate(images[imageIndex]->getWidth(), 0);
+    videos[videoIndex]->draw();
+    ofPopMatrix();
+//    if(doMix) {
+//        blend.begin();
+//        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
+//        blend.setUniformTexture("vidTex", videos[videoIndex]->getTexture(), 1);
+//        blend.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+//        blend.setUniform1f("imgScale", imgScale);
+//        blend.setUniform1f("vidScale", vidScale);
+//        blend.setUniform2f("imgOffset", imageOffset.get().x, imageOffset.get().y);
+//        ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+//        blend.end();
+//    } else {
+//        if(showImg) {
+//            ofPushMatrix();
+//            ofScale(imgScale, imgScale);
+//            images[imageIndex]->draw();
+//            ofPopMatrix();
+//        } else {
+//            ofPushMatrix();
+//            ofScale(vidScale, vidScale);
+//            videos[videoIndex]->draw();
+//            ofPopMatrix();
+//        }
+//    }
     
     ofSetColor(255);
     gui.draw();
@@ -93,10 +102,26 @@ void ofApp::onImageOffsetChanged(ofVec2f & offset) {
     images[imageIndex]->pos = offset;
 }
 
+//--------------------------------------------------------------
+void ofApp::saveHotspots() {
+    ofxXmlSettings settings;
+    for(int i = 0; i < videos.size(); i++) {
+        settings.setValue("videos:" + videos[i]->filePath + ":hotspot:x", videos[i]->hotspot.x);
+        settings.setValue("videos:" + videos[i]->filePath + ":hotspot:y", videos[i]->hotspot.y);
+    }
+    for(int i = 0; i < images.size(); i++) {
+        settings.setValue("images:" + images[i]->filePath + ":hotspot:x", images[i]->hotspot.x);
+        settings.setValue("images:" + images[i]->filePath + ":hotspot:y", images[i]->hotspot.y);
+    }
+    
+    settings.saveFile("settings.xml");
+}
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+    if(key == ' ') {
+        saveHotspots();
+    }
 }
 
 //--------------------------------------------------------------
@@ -111,12 +136,34 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+    ofVec2f p = ofVec2f(x, y);
+    if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
+        if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
+            images[imageIndex]->hotspot = p / (scale);
+        }
+    }
+    
+    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale) {
+        if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale) {
+            videos[videoIndex]->hotspot = p / (scale);
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+    ofVec2f p = ofVec2f(x, y);
+    if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
+        if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
+            images[imageIndex]->hotspot = p / (scale);
+        }
+    }
+    
+    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale) {
+        if(p.y > 0 && p.y <  videos[videoIndex]->baseHeight * scale) {
+            videos[videoIndex]->hotspot = (p - ofVec2f(images[imageIndex]->baseWidth * scale, 0)) / scale;
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -136,25 +183,7 @@ void ofApp::mouseExited(int x, int y){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-    if(images[imageIndex]->baseWidth > images[imageIndex]->baseHeight) {
-        imgScale =  w / images[imageIndex]->baseWidth;
-        images[imageIndex]->drawWidth = w;
-        images[imageIndex]->drawHeight = images[imageIndex]->baseHeight * imgScale;
-    } else {
-        imgScale =  h / images[imageIndex]->baseHeight;
-        images[imageIndex]->drawWidth = images[imageIndex]->baseWidth * imgScale;
-        images[imageIndex]->drawHeight = h;
-    }
     
-    if(videos[videoIndex]->baseWidth > videos[videoIndex]->baseHeight) {
-        vidScale =  w / videos[videoIndex]->baseWidth;
-        videos[videoIndex]->drawWidth = w;
-        videos[videoIndex]->drawHeight = videos[videoIndex]->baseHeight * vidScale;
-    } else {
-        vidScale =  h / videos[videoIndex]->baseWidth;
-        videos[videoIndex]->drawWidth = videos[videoIndex]->baseWidth * vidScale;
-        videos[videoIndex]->drawHeight = h;
-    }
 }
 
 //--------------------------------------------------------------

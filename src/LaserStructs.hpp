@@ -13,56 +13,74 @@
 struct LaserImage : ofImage {
 public:
     LaserImage() {
-        baseWidth = drawWidth = 0;
-        baseHeight = drawHeight = 0;
-        pos = ofVec2f(0, 0);
+        baseWidth = 0;
+        baseHeight = 0;
+        hotspot = ofVec2f(0, 0);
         filePath = "";
     }
     ofVec2f pos;
+    ofVec2f hotspot;
     float baseWidth, baseHeight;
-    float drawWidth, drawHeight;
-    
     string filePath;
+    
     bool loadImage(string path) {
         filePath = path;
         bool loaded = ofImage::load(path);
+        cout<<"w: "<<getWidth()<<endl;
+        cout<<"h: "<<getHeight()<<endl;
         baseWidth = getWidth();
         baseHeight = getHeight();
-        drawWidth = baseWidth;
-        drawHeight = baseHeight;
+        hotspot = ofVec2f(baseWidth/2, baseHeight/2);
         return loaded;
     }
     void draw() {
-        ofImage::draw(pos.x, pos.y, drawWidth, drawHeight);
+        ofImage::draw(0, 0, baseWidth, baseHeight);
+        drawCross(hotspot);
+        
     }
 private:
+    void drawCross(ofVec2f p) {
+        ofPushStyle();
+        ofSetColor(255, 0, 0);
+        ofDrawLine(p.x - 10, p.y, p.x + 10, p.y);
+        ofDrawLine(p.x, p.y - 10, p.x, p.y + 10);
+        ofPopStyle();
+    }
 };
 
 struct LaserVideo : ofVideoPlayer {
 public:
     LaserVideo() {
-        baseWidth = drawWidth = 0;
-        baseHeight = drawHeight = 0;
-        pos = ofVec2f(0, 0);
+        baseWidth = 0;
+        baseHeight = 0;
+        hotspot = ofVec2f(0, 0);
         filePath = "";
     }
-    ofVec2f pos;
+    ofVec2f(hotspot);
     string filePath;
     float baseWidth, baseHeight;
-    float drawWidth, drawHeight;
+    
     bool loadVideo(string path) {
         filePath = path;
         bool loaded = ofVideoPlayer::load(path);
         baseWidth = getWidth();
         baseHeight = getHeight();
-        drawWidth = baseWidth;
-        drawHeight = baseHeight;
+        hotspot = ofVec2f(baseWidth/2, baseHeight/2);
         return loaded;
     }
+    
     void draw() {
-        ofVideoPlayer::draw(pos.x, pos.y, drawWidth, drawHeight);
+        ofVideoPlayer::draw(0, 0, baseWidth, baseHeight);
+        drawCross(hotspot);
     }
 private:
+    void drawCross(ofVec2f p) {
+        ofPushStyle();
+        ofSetColor(255, 0, 0);
+        ofDrawLine(p.x - 10, p.y, p.x + 10, p.y);
+        ofDrawLine(p.x, p.y - 10, p.x, p.y + 10);
+        ofPopStyle();
+    }
 };
 
 #endif /* LaserStructs_hpp */
