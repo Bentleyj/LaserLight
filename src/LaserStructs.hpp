@@ -22,9 +22,15 @@ public:
     ofVec2f hotspot;
     float baseWidth, baseHeight;
     string filePath;
+    string tag;
     
     bool loadImage(string path) {
         filePath = path;
+        tag = removeCharacter(path, " ");
+        tag = removeCharacter(tag, ".");
+        tag = removeCharacter(tag, "/");
+        tag = removeCharacter(tag, "(");
+        tag = removeCharacter(tag, ")");
         bool loaded = ofImage::load(path);
         cout<<"w: "<<getWidth()<<endl;
         cout<<"h: "<<getHeight()<<endl;
@@ -46,6 +52,14 @@ private:
         ofDrawLine(p.x, p.y - 10, p.x, p.y + 10);
         ofPopStyle();
     }
+    string removeCharacter(string s, string c) {
+        vector<string> v = ofSplitString(s, c);
+        string s2 = "";
+        for(int i = 0; i < v.size(); i++) {
+            s2 += v[i];
+        }
+        return s2;
+    }
 };
 
 struct LaserVideo : ofVideoPlayer {
@@ -58,10 +72,16 @@ public:
     }
     ofVec2f(hotspot);
     string filePath;
+    string tag;
     float baseWidth, baseHeight;
     
     bool loadVideo(string path) {
         filePath = path;
+        tag = removeCharacter(path, " ");
+        tag = removeCharacter(tag, ".");
+        tag = removeCharacter(tag, "/");
+        tag = removeCharacter(tag, "(");
+        tag = removeCharacter(tag, ")");
         bool loaded = ofVideoPlayer::load(path);
         baseWidth = getWidth();
         baseHeight = getHeight();
@@ -80,6 +100,14 @@ private:
         ofDrawLine(p.x - 10, p.y, p.x + 10, p.y);
         ofDrawLine(p.x, p.y - 10, p.x, p.y + 10);
         ofPopStyle();
+    }
+    string removeCharacter(string s, string c) {
+        vector<string> v = ofSplitString(s, c);
+        string s2 = "";
+        for(int i = 0; i < v.size(); i++) {
+            s2 += v[i];
+        }
+        return s2;
     }
 };
 

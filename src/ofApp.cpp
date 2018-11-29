@@ -23,6 +23,7 @@ void ofApp::setup(){
     gui.add(imageIndex.set("Image Index", 0, 0, images.size() - 1));
     gui.add(videoIndex.set("Video Index", 0, 0, videos.size() - 1));
     gui.add(scale.set("Scale", 1, 0, 3));
+    gui.add(videoScale.set("Vid Scale", 1, 0, 100));
 
     gui.loadFromFile(settingsPath);
     
@@ -32,12 +33,27 @@ void ofApp::setup(){
     
     blend.load("shaders/blend");
     
-//    ofxXmlSettings settings;
-//    settings.load("settings.xml");
-//    settings.pushTag("videos");
-//    for(int i = 0; i < videos.size(); i++) {
-//        for(int i = 0; i < settings.get)
-//    }
+    ofxXmlSettings settings;
+    settings.load("settings.xml");
+    settings.pushTag("videos");
+    for(int i = 0; i < videos.size(); i++) {
+        settings.pushTag(videos[i]->tag);
+        float x = settings.getValue("hotspot:x", 10);
+        float y = settings.getValue("hotspot:y", 10);
+        videos[i]->hotspot = ofVec2f(x, y);
+        settings.popTag();
+    }
+    settings.popTag();
+    
+    settings.pushTag("images");
+    for(int i = 0; i < images.size(); i++) {
+        settings.pushTag(images[i]->tag);
+        float x = settings.getValue("hotspot:x", 10);
+        float y = settings.getValue("hotspot:y", 10);
+        images[i]->hotspot = ofVec2f(x, y);
+        settings.popTag();
+    }
+    settings.popTag();
     
     videos[videoIndex]->play();
 }
@@ -49,11 +65,23 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+//    ofPushMatrix();
+//    ofScale(scale, scale);
+//    ofTranslate(0, 0);
+//    images[imageIndex]->draw();
+//    ofTranslate(images[imageIndex]->getWidth(), 0);
+//    videos[videoIndex]->draw();
+//    ofPopMatrix();
+    
     ofPushMatrix();
+    ofSetColor(255, 127);
     ofScale(scale, scale);
-    ofTranslate(0, 0);
     images[imageIndex]->draw();
-    ofTranslate(images[imageIndex]->getWidth(), 0);
+    ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
+    ofTranslate(diff);
+    ofTranslate(videos[videoIndex]->hotspot);
+    ofScale(videoScale, videoScale);
+    ofTranslate(-1 * videos[videoIndex]->hotspot);
     videos[videoIndex]->draw();
     ofPopMatrix();
 //    if(doMix) {
@@ -106,12 +134,12 @@ void ofApp::onImageOffsetChanged(ofVec2f & offset) {
 void ofApp::saveHotspots() {
     ofxXmlSettings settings;
     for(int i = 0; i < videos.size(); i++) {
-        settings.setValue("videos:" + videos[i]->filePath + ":hotspot:x", videos[i]->hotspot.x);
-        settings.setValue("videos:" + videos[i]->filePath + ":hotspot:y", videos[i]->hotspot.y);
+        settings.setValue("videos:" + videos[i]->tag + ":hotspot:x", videos[i]->hotspot.x);
+        settings.setValue("videos:" + videos[i]->tag + ":hotspot:y", videos[i]->hotspot.y);
     }
     for(int i = 0; i < images.size(); i++) {
-        settings.setValue("images:" + images[i]->filePath + ":hotspot:x", images[i]->hotspot.x);
-        settings.setValue("images:" + images[i]->filePath + ":hotspot:y", images[i]->hotspot.y);
+        settings.setValue("images:" + images[i]->tag + ":hotspot:x", images[i]->hotspot.x);
+        settings.setValue("images:" + images[i]->tag + ":hotspot:y", images[i]->hotspot.y);
     }
     
     settings.saveFile("settings.xml");

@@ -35,7 +35,8 @@ class ofApp : public ofBaseApp{
     vector<LaserVideo*> videos;
     
     ofParameter<float> scale;
-    
+    ofParameter<float> videoScale;
+
     ofxPanel gui;
     
     ofShader blend;
