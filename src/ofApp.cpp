@@ -65,25 +65,26 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-//    ofPushMatrix();
-//    ofScale(scale, scale);
-//    ofTranslate(0, 0);
-//    images[imageIndex]->draw();
-//    ofTranslate(images[imageIndex]->getWidth(), 0);
-//    videos[videoIndex]->draw();
-//    ofPopMatrix();
-    
     ofPushMatrix();
-    ofSetColor(255, 127);
     ofScale(scale, scale);
+    ofTranslate(0, 0);
     images[imageIndex]->draw();
-    ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
-    ofTranslate(diff);
-    ofTranslate(videos[videoIndex]->hotspot);
+    ofTranslate(images[imageIndex]->getWidth(), 0);
     ofScale(videoScale, videoScale);
-    ofTranslate(-1 * videos[videoIndex]->hotspot);
     videos[videoIndex]->draw();
     ofPopMatrix();
+    
+//    ofPushMatrix();
+//    ofSetColor(255, 127);
+//    ofScale(scale, scale);
+//    images[imageIndex]->draw();
+//    ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
+//    ofTranslate(diff);
+//    ofTranslate(videos[videoIndex]->hotspot);
+//    ofScale(videoScale, videoScale);
+//    ofTranslate(-1 * videos[videoIndex]->hotspot);
+//    videos[videoIndex]->draw();
+//    ofPopMatrix();
 //    if(doMix) {
 //        blend.begin();
 //        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
@@ -171,9 +172,9 @@ void ofApp::mouseDragged(int x, int y, int button){
         }
     }
     
-    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale) {
-        if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale) {
-            videos[videoIndex]->hotspot = p / (scale);
+    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
+        if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
+            videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
         }
     }
 }
@@ -187,9 +188,11 @@ void ofApp::mousePressed(int x, int y, int button){
         }
     }
     
-    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale) {
-        if(p.y > 0 && p.y <  videos[videoIndex]->baseHeight * scale) {
-            videos[videoIndex]->hotspot = (p - ofVec2f(images[imageIndex]->baseWidth * scale, 0)) / scale;
+    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
+        if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
+            cout<<p<<endl;
+            cout<<p / scale<<endl;
+            videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
         }
     }
 }
