@@ -18,6 +18,7 @@ class ofApp : public ofBaseApp{
     void onVideoChanged(int & index);
     void onImageOffsetChanged(ofVec2f & offset);
     void saveHotspots();
+    float calculateScaleForVideoToFitImage(LaserImage* img, LaserVideo* vid);
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -36,6 +37,7 @@ class ofApp : public ofBaseApp{
     
     ofParameter<float> scale;
     ofParameter<float> videoScale;
+    ofParameter<bool> doMix;
 
     ofxPanel gui;
     

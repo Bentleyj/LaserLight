@@ -24,6 +24,7 @@ void ofApp::setup(){
     gui.add(videoIndex.set("Video Index", 0, 0, videos.size() - 1));
     gui.add(scale.set("Scale", 1, 0, 3));
     gui.add(videoScale.set("Vid Scale", 1, 0, 100));
+    gui.add(doMix.set("Mix", false));
 
     gui.loadFromFile(settingsPath);
     
@@ -65,26 +66,31 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofPushMatrix();
-    ofScale(scale, scale);
-    ofTranslate(0, 0);
-    images[imageIndex]->draw();
-    ofTranslate(images[imageIndex]->getWidth(), 0);
-    ofScale(videoScale, videoScale);
-    videos[videoIndex]->draw();
-    ofPopMatrix();
+    if(doMix) {
+        ofPushMatrix();
+        ofSetColor(255, 127);
+        ofScale(scale, scale);
+        images[imageIndex]->draw();
+        ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
+        ofTranslate(diff);
+        ofTranslate(videos[videoIndex]->hotspot);
+        ofScale(videoScale, videoScale);
+        ofTranslate(-1 * videos[videoIndex]->hotspot);
+        videos[videoIndex]->draw();
+        ofPopMatrix();
+    } else {
+        ofPushMatrix();
+        ofScale(scale, scale);
+        ofTranslate(0, 0);
+        images[imageIndex]->draw();
+        ofTranslate(images[imageIndex]->getWidth(), 0);
+        ofScale(videoScale, videoScale);
+        videos[videoIndex]->draw();
+        ofPopMatrix();
+    }
+
     
-//    ofPushMatrix();
-//    ofSetColor(255, 127);
-//    ofScale(scale, scale);
-//    images[imageIndex]->draw();
-//    ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
-//    ofTranslate(diff);
-//    ofTranslate(videos[videoIndex]->hotspot);
-//    ofScale(videoScale, videoScale);
-//    ofTranslate(-1 * videos[videoIndex]->hotspot);
-//    videos[videoIndex]->draw();
-//    ofPopMatrix();
+    
 //    if(doMix) {
 //        blend.begin();
 //        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
@@ -112,6 +118,17 @@ void ofApp::draw(){
     ofSetColor(255);
     gui.draw();
 }
+
+//--------------------------------------------------------------
+float ofApp::calculateScaleForVideoToFitImage(LaserImage* img, LaserVideo* vid) {
+    // We assume that img is larger than vid
+    // First we identify the biggest difference between top, bottom, left and right.
+    float rightI = img->baseWidth - img->hotspot.x;
+    float leftI = img->hotspot.x;
+    float topI = img->hotspot.y;
+    float bottomI = img->baseHeight - img->hotspot.y;
+}
+
 
 //--------------------------------------------------------------
 void ofApp::onImageChanged(int & index) {
@@ -165,34 +182,36 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-    ofVec2f p = ofVec2f(x, y);
-    if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
-        if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
-            images[imageIndex]->hotspot = p / (scale);
+    if(!doMix) {
+        ofVec2f p = ofVec2f(x, y);
+        if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
+            if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
+                images[imageIndex]->hotspot = p / (scale);
+            }
         }
-    }
-    
-    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
-        if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
-            videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
+        if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
+            if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
+                videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
+            }
         }
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    ofVec2f p = ofVec2f(x, y);
-    if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
-        if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
-            images[imageIndex]->hotspot = p / (scale);
+    if(!doMix) {
+        ofVec2f p = ofVec2f(x, y);
+        if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
+            if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
+                images[imageIndex]->hotspot = p / (scale);
+            }
         }
-    }
-    
-    if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
-        if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
-            cout<<p<<endl;
-            cout<<p / scale<<endl;
-            videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
+        if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
+            if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
+                cout<<p<<endl;
+                cout<<p / scale<<endl;
+                videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
+            }
         }
     }
 }
