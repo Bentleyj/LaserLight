@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <Controls>
-	<Fade>1</Fade>
+	<Fade>0.643537</Fade>
 	<Fade_Speed>0.0071875</Fade_Speed>
 	<Image_Duration>15.7084</Image_Duration>
-	<Max_Onset>10000</Max_Onset>
-	<Onset_Novelty>14994</Onset_Novelty>
+	<Max_Onset>5848.83</Max_Onset>
+	<Onset_Novelty>4045.38</Onset_Novelty>
 	<Jump_Cooldown>0.10082</Jump_Cooldown>
 </Controls>
