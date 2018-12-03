@@ -14,6 +14,8 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+    
+        void setRandomSettings(VimageMixer* mixer);
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -31,8 +33,13 @@ class ofApp : public ofBaseApp{
         vector<LaserVideo*> videos;
         vector<VimageMixer> mixers;
     
+        float lastSwapTime;
+        int fadeTarget = 0;
+        
         ofxPanel gui;
         ofParameter<float> fade;
+        ofParameter<float> imageDuration;
+        ofParameter<float> fadeSpeed;
     
         bool showGui;
         

@@ -19,6 +19,8 @@ void ofApp::setup(){
     
     gui.setup("Controls");
     gui.add(fade.set("Fade", 0, 0, 1));
+    gui.add(fadeSpeed.set("Fade Speed", 0.1, 0.0, 1.0));
+    gui.add(imageDuration.set("Image Duration", 5.0, 1.0, 30.0));
     
     blend.load("shaders/blend");
     fadeShader.load("shaders/fade");
@@ -54,12 +56,28 @@ void ofApp::setup(){
         mixers[i].blend = &blend;
         mixers[i].setup();
     }
+    
+    lastSwapTime = ofGetElapsedTimef();
 }
+
 
 //--------------------------------------------------------------
 void ofApp::update(){
     for(int i = 0; i < mixers.size(); i++) {
         mixers[i].update();
+    }
+    if(ofGetElapsedTimef() - lastSwapTime > imageDuration) {
+        fadeTarget = int(fade.get()+1) % 2;
+        lastSwapTime = ofGetElapsedTimef();
+        if(fade == 0) {
+            setRandomSettings(&(mixers[1]));
+        } else if(fade == 1.0){
+            setRandomSettings(&(mixers[0]));
+        }
+    }
+    fade = ofLerp(fade, fadeTarget, fadeSpeed);
+    if(abs(fade - fadeTarget) < 0.01) {
+        fade = fadeTarget;
     }
 }
 
@@ -78,17 +96,38 @@ void ofApp::draw(){
     fadeShader.end();
 //    mixers[0].draw();
     
-    for(int i = 0; i < mixers.size(); i++) {
-        mixers[i].drawGui();
+    if(showGui) {
+        for(int i = 0; i < mixers.size(); i++) {
+            mixers[i].drawGui();
+        }
+        gui.draw();
     }
-    gui.draw();
+
     ofSetColor(255);
+}
+
+//--------------------------------------------------------------
+void ofApp::setRandomSettings(VimageMixer* mixer) {
+    mixer->imageIndex = ofRandom(0, mixer->images->size());
+    mixer->videoIndex = ofRandom(0, mixer->videos->size());
+    ofImage* img = (*mixer->images)[mixer->imageIndex];
+    mixer->scale = ofRandom(0.1, 0.2);
+    
+    ofVec2f offset = ofVec2f(ofRandom(100, ofGetWidth() - img->getWidth() * mixer->scale - 100), ofRandom(100, ofGetHeight() - img->getHeight() * mixer->scale));
+    mixer->imageOffset.set(offset);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if(key == 'g') {
         showGui = !showGui;
+    }
+    if(key == ' ') {
+        if(fade == 0) {
+            setRandomSettings(&(mixers[1]));
+        } else if(fade == 1.0){
+            setRandomSettings(&(mixers[0]));
+        }
     }
 }
 
