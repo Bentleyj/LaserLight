@@ -17,21 +17,6 @@ void ofApp::setup(){
         images.push_back(img);
     }
     
-    string settingsPath = "settings/settings.xml";
-    gui.setup("Controls", settingsPath);
-    gui.add(imageOffset.set("Image Offset", ofVec2f(0, 0), ofVec2f(-ofGetWidth()*2, -ofGetHeight()*2), ofVec2f(ofGetWidth()*2, ofGetHeight()*2)));
-    gui.add(imageIndex.set("Image Index", 0, 0, images.size() - 1));
-    gui.add(videoIndex.set("Video Index", 0, 0, videos.size() - 1));
-    gui.add(scale.set("Scale", 1, 0, 3));
-    gui.add(videoScale.set("Vid Scale", 1, 0, 100));
-    gui.add(doMix.set("Mix", false));
-
-    gui.loadFromFile(settingsPath);
-    
-    imageIndex.addListener(this, &ofApp::onImageChanged);
-    videoIndex.addListener(this, &ofApp::onVideoChanged);
-    imageOffset.addListener(this, &ofApp::onImageOffsetChanged);
-    
     blend.load("shaders/blend");
     
     ofxXmlSettings settings;
@@ -56,138 +41,34 @@ void ofApp::setup(){
     }
     settings.popTag();
     
-    videos[videoIndex]->play();
+    mixers.resize(2);
+    for(int i = 0; i < mixers.size(); i++) {
+        mixers[i].images = &images;
+        mixers[i].videos = &videos;
+        mixers[i].blend = &blend;
+        mixers[i].setup();
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    videos[videoIndex]->update();
-    if(doMix) {
-        videoScale = calculateScaleForVideoToFitImage(images[imageIndex], videos[videoIndex]);
-//        if(images[imageIndex]->getWidth() / ofGetWidth() > images[imageIndex]->getHeight() / ofGetHeight()) {
-//            scale = ofGetWidth() / images[imageIndex]->getWidth();
-//        } else {
-//            scale = ofGetHeight() / images[imageIndex]->getHeight();
-//        }
+    for(int i = 0; i < mixers.size(); i++) {
+        mixers[i].update();
     }
+//    videos[videoIndex]->update();
+//    if(doMix) {
+//        videoScale = calculateScaleForVideoToFitImage(images[imageIndex], videos[videoIndex]);
+//    }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    if(doMix) {
-//        ofPushMatrix();
-//        ofSetColor(255, 127);
-//        ofScale(scale, scale);
-//        images[imageIndex]->draw();
-//        ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
-//        ofTranslate(diff);
-//        ofTranslate(videos[videoIndex]->hotspot);
-//        ofScale(videoScale, videoScale);
-//        ofTranslate(-1 * videos[videoIndex]->hotspot);
-//        videos[videoIndex]->draw();
-//        ofPopMatrix();
-        blend.begin();
-        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
-        blend.setUniformTexture("vidTex", videos[videoIndex]->getTexture(), 1);
-        blend.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
-        blend.setUniform2f("imgSize", images[imageIndex]->getWidth(), images[imageIndex]->getHeight());
-        blend.setUniform2f("vidSize", videos[videoIndex]->getWidth(), videos[videoIndex]->getHeight());
-        blend.setUniform2f("imgHotspot", images[imageIndex]->hotspot.x, images[imageIndex]->hotspot.y);
-        blend.setUniform2f("vidHotspot", videos[videoIndex]->hotspot.x, videos[videoIndex]->hotspot.y);
-        blend.setUniform1f("vidScale", videoScale);
-        blend.setUniform1f("scale", scale);
-        blend.setUniform2f("imageOffset", imageOffset.get().x, imageOffset.get().y);
-        ofDrawRectangle(0, 0, ofGetWidth() / scale, ofGetHeight() / scale);
-        blend.end();
-    } else {
-        ofPushMatrix();
-        ofScale(scale, scale);
-        ofTranslate(0, 0);
-        images[imageIndex]->draw();
-        ofTranslate(images[imageIndex]->getWidth(), 0);
-        ofScale(videoScale, videoScale);
-        videos[videoIndex]->draw();
-        ofPopMatrix();
-
+    for(int i = 0; i < mixers.size(); i++) {
+        mixers[i].drawToBuffer();
     }
-
-    
-    
-//    if(doMix) {
-
-//    } else {
-//        if(showImg) {
-//            ofPushMatrix();
-//            ofScale(imgScale, imgScale);
-//            images[imageIndex]->draw();
-//            ofPopMatrix();
-//        } else {
-//            ofPushMatrix();
-//            ofScale(vidScale, vidScale);
-//            videos[videoIndex]->draw();
-//            ofPopMatrix();
-//        }
-//    }
+    mixers[0].draw();
     
     ofSetColor(255);
-    gui.draw();
-}
-
-bool comparePair(pair<int, float> a, pair<int, float> b) {
-    return b.second < a.second;
-}
-
-//--------------------------------------------------------------
-float ofApp::calculateScaleForVideoToFitImage(LaserImage* img, LaserVideo* vid) {
-    // We assume that img is larger than vid
-    // First we identify the biggest difference between top, bottom, left and right.
-    float rightI = img->baseWidth - img->hotspot.x;
-    float leftI = img->hotspot.x;
-    float topI = img->hotspot.y;
-    float bottomI = img->baseHeight - img->hotspot.y;
-
-    float rightV = vid->baseWidth - vid->hotspot.x;
-    float leftV = vid->hotspot.x;
-    float topV = vid->hotspot.y;
-    float bottomV = vid->baseHeight - vid->hotspot.y;
-    
-    vector<pair<char, float> > diffSizes;
-    float rightD = rightI / rightV;
-    float leftD = leftI / leftV;
-    float topD = topI / topV;
-    float bottomD = bottomI / bottomV;
-    pair<char, float> c = make_pair('r', rightD);
-    diffSizes.push_back(c);
-    c = make_pair('l', leftD);
-    diffSizes.push_back(c);
-    c = make_pair('t', topD);
-    diffSizes.push_back(c);
-    c = make_pair('b', bottomD);
-    diffSizes.push_back(c);
-    
-    sort(diffSizes.begin(), diffSizes.end(), comparePair);
-    
-    float scale = diffSizes[0].second;
-    
-    return scale;
-}
-
-//--------------------------------------------------------------
-void ofApp::onImageChanged(int & index) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::onVideoChanged(int & index) {
-    for(int i = 0; i < videos.size(); i++) {
-        videos[i]->stop();
-    }
-    videos[index]->play();
-}
-
-//--------------------------------------------------------------
-void ofApp::onImageOffsetChanged(ofVec2f & offset) {
-    images[imageIndex]->pos = offset;
 }
 
 //--------------------------------------------------------------
@@ -210,8 +91,6 @@ void ofApp::keyPressed(int key){
     if(key == ' ') {
         saveHotspots();
     }
-    
-    calculateScaleForVideoToFitImage(images[imageIndex], videos[videoIndex]);
 }
 
 //--------------------------------------------------------------
@@ -226,38 +105,38 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-    if(!doMix) {
-        ofVec2f p = ofVec2f(x, y);
-        if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
-            if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
-                images[imageIndex]->hotspot = p / (scale);
-            }
-        }
-        if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
-            if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
-                videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
-            }
-        }
-    }
+//    if(!doMix) {
+//        ofVec2f p = ofVec2f(x, y);
+//        if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
+//            if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
+//                images[imageIndex]->hotspot = p / (scale);
+//            }
+//        }
+//        if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
+//            if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
+//                videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
+//            }
+//        }
+//    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    if(!doMix) {
-        ofVec2f p = ofVec2f(x, y);
-        if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
-            if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
-                images[imageIndex]->hotspot = p / (scale);
-            }
-        }
-        if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
-            if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
-                cout<<p<<endl;
-                cout<<p / scale<<endl;
-                videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
-            }
-        }
-    }
+//    if(!doMix) {
+//        ofVec2f p = ofVec2f(x, y);
+//        if(p.x > 0 && p.x < images[imageIndex]->baseWidth * scale) {
+//            if(p.y > 0 && p.y < images[imageIndex]->baseHeight * scale) {
+//                images[imageIndex]->hotspot = p / (scale);
+//            }
+//        }
+//        if(p.x > images[imageIndex]->baseWidth * scale && p.x < images[imageIndex]->baseWidth * scale + videos[videoIndex]->baseWidth * scale * videoScale) {
+//            if(p.y > 0 && p.y < videos[videoIndex]->baseHeight * scale * videoScale) {
+//                cout<<p<<endl;
+//                cout<<p / scale<<endl;
+//                videos[videoIndex]->hotspot = ofVec2f(p.x - images[imageIndex]->baseWidth * scale, p.y) / (scale * videoScale);
+//            }
+//        }
+//    }
 }
 
 //--------------------------------------------------------------

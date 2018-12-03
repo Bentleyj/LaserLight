@@ -6,6 +6,7 @@
 #include "ofxNestedFileLoader.h"
 #include "ofxGui.h"
 #include "LaserStructs.hpp"
+#include "VimageMixer.hpp"
 
 class ofApp : public ofBaseApp{
 
@@ -14,11 +15,7 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
     
-    void onImageChanged(int & index);
-    void onVideoChanged(int & index);
-    void onImageOffsetChanged(ofVec2f & offset);
-    void saveHotspots();
-    float calculateScaleForVideoToFitImage(LaserImage* img, LaserVideo* vid);
+        void saveHotspots();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -32,18 +29,9 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    vector<LaserImage*> images;
-    vector<LaserVideo*> videos;
+        vector<LaserImage*> images;
+        vector<LaserVideo*> videos;
+        vector<VimageMixer> mixers;
     
-    ofParameter<float> scale;
-    ofParameter<float> videoScale;
-    ofParameter<bool> doMix;
-
-    ofxPanel gui;
-    
-    ofShader blend;
-    
-    ofParameter<ofVec2f> imageOffset;
-    ofParameter<int> imageIndex;
-    ofParameter<int> videoIndex;
+        ofShader blend;
 };

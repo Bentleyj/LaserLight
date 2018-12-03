@@ -42,7 +42,6 @@ public:
     void draw() {
         ofImage::draw(0, 0, baseWidth, baseHeight);
         drawCross(hotspot);
-        
     }
 private:
     void drawCross(ofVec2f p) {

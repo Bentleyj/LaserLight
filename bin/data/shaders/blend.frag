@@ -21,7 +21,7 @@ void main() {
     
     vec2 uv = gl_FragCoord.xy / resolution;
     
-    uv.y = 1.0 - uv.y;
+//    uv.y = 1.0 - uv.y;
     
     
     vec2 uvAbs = uv * resolution;
