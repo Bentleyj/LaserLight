@@ -10,6 +10,7 @@ uniform vec2 vidHotspot;
 uniform float vidScale;
 uniform float scale;
 uniform vec2 imageOffset;
+uniform float novelty;
 
 float length(vec3 v) {
     return sqrt(v.x * v.x + v.y * v.y + v.x * v.z);
@@ -45,6 +46,8 @@ void main() {
     vec3 tc2 = texture2DRect(vidTex, vidPix).rgb;
     
     vec3 tc = mix(tc1 * tc2, tc2, tc1);
+    
+//    tc *= novelty;
 
     if(uvAbs.x > imgSize.x || uvAbs.x < 0 || uvAbs.y > imgSize.y || uvAbs.y < 0) {
         if(uvAbs.x > imgSize.x + width || uvAbs.x < 0 - width || uvAbs.y > imgSize.y + width || uvAbs.y < 0 - width) {

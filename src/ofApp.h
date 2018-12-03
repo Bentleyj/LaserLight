@@ -7,6 +7,7 @@
 #include "ofxGui.h"
 #include "LaserStructs.hpp"
 #include "VimageMixer.hpp"
+#include "ofxAubio.h"
 
 class ofApp : public ofBaseApp{
 
@@ -28,6 +29,9 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+        void exit();
+    
+        void audioIn(float * input, int bufferSize, int nChannels);
     
         vector<LaserImage*> images;
         vector<LaserVideo*> videos;
@@ -40,9 +44,16 @@ class ofApp : public ofBaseApp{
         ofParameter<float> fade;
         ofParameter<float> imageDuration;
         ofParameter<float> fadeSpeed;
+        ofParameter<float> onsetNovelty;
+        ofParameter<float> maxOnset;
+    
+        float lastJumpTime;
+        ofParameter<float> jumpCooldown;
     
         bool showGui;
         
         ofShader blend;
         ofShader fadeShader;
+    
+        ofxAubioOnset onset;
 };

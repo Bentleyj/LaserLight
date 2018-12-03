@@ -32,7 +32,6 @@ void VimageMixer::setup() {
 
 //--------------------------------------------------------------
 void VimageMixer::update() {
-    (*videos)[videoIndex]->update();
     videoScale = calculateScaleForVideoToFitImage((*images)[imageIndex], (*videos)[videoIndex]);
 }
 
@@ -66,6 +65,7 @@ void VimageMixer::drawToBuffer() {
     blend->setUniform1f("vidScale", videoScale);
     blend->setUniform1f("scale", scale);
     blend->setUniform2f("imageOffset", imageOffset.get().x, imageOffset.get().y);
+    blend->setUniform1f("novelty", novelty);
     ofDrawRectangle(0, 0, ofGetWidth() / scale, ofGetHeight() / scale);
     blend->end();
     buffer.end();
@@ -78,10 +78,7 @@ void VimageMixer::onImageChanged(int & index) {
 
 //--------------------------------------------------------------
 void VimageMixer::onVideoChanged(int & index) {
-//    for(int i = 0; i < videos->size(); i++) {
-//        (*videos)[i]->stop();
-//    }
-    (*videos)[index]->play();
+//    (*videos)[index]->play();
 }
 
 //--------------------------------------------------------------

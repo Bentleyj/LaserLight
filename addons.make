@@ -1,3 +1,4 @@
+ofxAubio
 ofxGui
 ofxNestedFileLoader
 ofxXmlSettings

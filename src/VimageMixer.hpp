@@ -43,6 +43,8 @@ public:
     ofFbo buffer;
     
     ofShader* blend;
+    
+    float novelty;
 
 private:
 };

@@ -7,6 +7,7 @@ void ofApp::setup(){
     for(int i = 0; i < vidPaths.size(); i++) {
         LaserVideo* vid = new LaserVideo();
         vid->loadVideo(vidPaths[i]);
+        vid->play();
         videos.push_back(vid);
     }
     loader.clearPaths();
@@ -22,6 +23,9 @@ void ofApp::setup(){
     gui.add(fade.set("Fade", 0, 0, 1));
     gui.add(fadeSpeed.set("Fade Speed", 0.1, 0.0, 1.0));
     gui.add(imageDuration.set("Image Duration", 5.0, 1.0, 30.0));
+    gui.add(maxOnset.set("Max Onset", 5000, 0.0, 10000));
+    gui.add(onsetNovelty.set("Onset Novelty", 0, 0, maxOnset));
+    gui.add(jumpCooldown.set("Jump Cooldown", 0, 0, 1.0));
     gui.loadFromFile(settingsPath);
     
     blend.load("shaders/blend");
@@ -60,14 +64,39 @@ void ofApp::setup(){
         setRandomSettings(&(mixers[i]));
     }
     
+    onset.setup();
+    
+    int nOutputs = 2;
+    int nInputs = 2;
+    ofSoundStreamSetup(nOutputs, nInputs, this);
+    
     lastSwapTime = ofGetElapsedTimef();
 }
 
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    onsetNovelty.setMax(maxOnset);
+    onsetNovelty = onsetNovelty < onset.novelty ? onset.novelty : ofLerp(onsetNovelty, onset.novelty, 0.1);
+    if(onsetNovelty > maxOnset && ofGetElapsedTimef() - lastJumpTime > jumpCooldown) {
+        for(int i = 0; i < mixers.size(); i++) {
+            mixers[i].videoIndex++;
+            mixers[i].videoIndex %= mixers[i].videos->size();
+//            int frame = videos[mixers[i].videoIndex]->getCurrentFrame();
+//            int maxFrames = videos[mixers[i].videoIndex]->getTotalNumFrames();
+//            int step = 20;
+//            frame += step;
+//            frame %= maxFrames;
+//            videos[mixers[i].videoIndex]->setFrame(frame);
+        }
+        lastJumpTime = ofGetElapsedTimef();
+    }
     for(int i = 0; i < mixers.size(); i++) {
         mixers[i].update();
+        mixers[i].novelty = ofMap(onsetNovelty, 0, maxOnset, 0, 1, true);
+    }
+    for(int i = 0; i < videos.size(); i++) {
+        videos[i]->update();
     }
     if(ofGetElapsedTimef() - lastSwapTime > imageDuration) {
         fadeTarget = int(fade.get()+1) % 2;
@@ -82,6 +111,7 @@ void ofApp::update(){
     if(abs(fade - fadeTarget) < 0.01) {
         fade = fadeTarget;
     }
+    
 }
 
 //--------------------------------------------------------------
@@ -132,6 +162,18 @@ void ofApp::keyPressed(int key){
             setRandomSettings(&(mixers[0]));
         }
     }
+}
+
+//--------------------------------------------------------------
+void ofApp::exit(){
+    ofSoundStreamStop();
+    ofSoundStreamClose();
+}
+
+//--------------------------------------------------------------
+void ofApp::audioIn(float * input, int bufferSize, int nChannels){
+    // compute onset detection
+     onset.audioIn(input, bufferSize, nChannels);
 }
 
 //--------------------------------------------------------------

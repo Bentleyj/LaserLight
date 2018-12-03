@@ -9,7 +9,8 @@
 *.app/     
 *.pyc   
 .svn/   
-*.log      
+*.log    
+*.framework  
 
 #XCode
 *.pbxuser  
