@@ -17,7 +17,7 @@ float length(vec3 v) {
 
 void main() {
     
-    float width = 20;
+    float width = 100;
     
     vec2 uv = gl_FragCoord.xy / resolution;
     

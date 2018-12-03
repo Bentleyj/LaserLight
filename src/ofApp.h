@@ -14,8 +14,6 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
-    
-        void saveHotspots();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -33,5 +31,11 @@ class ofApp : public ofBaseApp{
         vector<LaserVideo*> videos;
         vector<VimageMixer> mixers;
     
+        ofxPanel gui;
+        ofParameter<float> fade;
+    
+        bool showGui;
+        
         ofShader blend;
+        ofShader fadeShader;
 };

@@ -17,7 +17,13 @@ void ofApp::setup(){
         images.push_back(img);
     }
     
+    gui.setup("Controls");
+    gui.add(fade.set("Fade", 0, 0, 1));
+    
     blend.load("shaders/blend");
+    fadeShader.load("shaders/fade");
+    
+    showGui = false;
     
     ofxXmlSettings settings;
     settings.load("settings.xml");
@@ -55,10 +61,6 @@ void ofApp::update(){
     for(int i = 0; i < mixers.size(); i++) {
         mixers[i].update();
     }
-//    videos[videoIndex]->update();
-//    if(doMix) {
-//        videoScale = calculateScaleForVideoToFitImage(images[imageIndex], videos[videoIndex]);
-//    }
 }
 
 //--------------------------------------------------------------
@@ -66,30 +68,27 @@ void ofApp::draw(){
     for(int i = 0; i < mixers.size(); i++) {
         mixers[i].drawToBuffer();
     }
-    mixers[0].draw();
     
+    fadeShader.begin();
+    fadeShader.setUniformTexture("tex1", mixers[0].buffer.getTexture(), 0);
+    fadeShader.setUniformTexture("tex2", mixers[1].buffer.getTexture(), 1);
+    fadeShader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+    fadeShader.setUniform1f("fadeAmount", fade);
+    ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+    fadeShader.end();
+//    mixers[0].draw();
+    
+    for(int i = 0; i < mixers.size(); i++) {
+        mixers[i].drawGui();
+    }
+    gui.draw();
     ofSetColor(255);
 }
 
 //--------------------------------------------------------------
-void ofApp::saveHotspots() {
-    ofxXmlSettings settings;
-    for(int i = 0; i < videos.size(); i++) {
-        settings.setValue("videos:" + videos[i]->tag + ":hotspot:x", videos[i]->hotspot.x);
-        settings.setValue("videos:" + videos[i]->tag + ":hotspot:y", videos[i]->hotspot.y);
-    }
-    for(int i = 0; i < images.size(); i++) {
-        settings.setValue("images:" + images[i]->tag + ":hotspot:x", images[i]->hotspot.x);
-        settings.setValue("images:" + images[i]->tag + ":hotspot:y", images[i]->hotspot.y);
-    }
-    
-    settings.saveFile("settings.xml");
-}
-
-//--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    if(key == ' ') {
-        saveHotspots();
+    if(key == 'g') {
+        showGui = !showGui;
     }
 }
 

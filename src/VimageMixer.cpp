@@ -78,9 +78,9 @@ void VimageMixer::onImageChanged(int & index) {
 
 //--------------------------------------------------------------
 void VimageMixer::onVideoChanged(int & index) {
-    for(int i = 0; i < videos->size(); i++) {
-        (*videos)[i]->stop();
-    }
+//    for(int i = 0; i < videos->size(); i++) {
+//        (*videos)[i]->stop();
+//    }
     (*videos)[index]->play();
 }
 
@@ -117,8 +117,6 @@ float VimageMixer::calculateScaleForVideoToFitImage(LaserImage* img, LaserVideo*
     
     
     float scale = diffSizes[3];
-    
-    cout<<scale<<endl;
 
     return scale;
 }
