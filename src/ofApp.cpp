@@ -71,6 +71,8 @@ void ofApp::setup(){
     ofSoundStreamSetup(nOutputs, nInputs, this);
     
     lastSwapTime = ofGetElapsedTimef();
+    
+    ofHideCursor();
 }
 
 
@@ -78,7 +80,7 @@ void ofApp::setup(){
 void ofApp::update(){
     onsetNovelty.setMax(maxOnset);
     onsetNovelty = onsetNovelty < onset.novelty ? onset.novelty : ofLerp(onsetNovelty, onset.novelty, 0.1);
-    if(onsetNovelty > maxOnset && ofGetElapsedTimef() - lastJumpTime > jumpCooldown) {
+    if(onsetNovelty > maxOnset && ofGetElapsedTimef() - lastJumpTime > jumpCooldown && maxOnset > 0) {
         for(int i = 0; i < mixers.size(); i++) {
             mixers[i].videoIndex++;
             mixers[i].videoIndex %= mixers[i].videos->size();
@@ -144,7 +146,7 @@ void ofApp::setRandomSettings(VimageMixer* mixer) {
     mixer->imageIndex = ofRandom(0, mixer->images->size());
     mixer->videoIndex = ofRandom(0, mixer->videos->size());
     ofImage* img = (*mixer->images)[mixer->imageIndex];
-    mixer->scale = ofRandom(0.1, 0.2);
+    mixer->scale = ofRandom(0.2, 0.3);
     
     ofVec2f offset = ofVec2f(ofRandom(100, ofGetWidth() - img->getWidth() * mixer->scale - 100), ofRandom(100, ofGetHeight() - img->getHeight() * mixer->scale));
     mixer->imageOffset.set(offset);
@@ -154,6 +156,12 @@ void ofApp::setRandomSettings(VimageMixer* mixer) {
 void ofApp::keyPressed(int key){
     if(key == 'g') {
         showGui = !showGui;
+        if(showGui) {
+            ofShowCursor();
+        }
+        else {
+            ofHideCursor();
+        }
     }
     if(key == ' ') {
         if(fade == 0) {
