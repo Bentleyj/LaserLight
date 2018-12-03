@@ -3,14 +3,14 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofxNestedFileLoader loader;
-    vector<string> vidPaths = loader.load("Lasers Films", "mp4");
+    vector<string> vidPaths = loader.load("Videos", "mov");
     for(int i = 0; i < vidPaths.size(); i++) {
         LaserVideo* vid = new LaserVideo();
         vid->loadVideo(vidPaths[i]);
         videos.push_back(vid);
     }
     loader.clearPaths();
-    vector<string> imgPaths = loader.load("LAZERS Pics B_W", "jpg");
+    vector<string> imgPaths = loader.load("Images", "jpg");
     for(int i = 0; i < imgPaths.size(); i++) {
         LaserImage* img = new LaserImage();
         img->loadImage(imgPaths[i]);
@@ -62,6 +62,9 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     videos[videoIndex]->update();
+    if(doMix) {
+        videoScale = calculateScaleForVideoToFitImage(images[imageIndex], videos[videoIndex]);
+    }
 }
 
 //--------------------------------------------------------------
@@ -119,6 +122,10 @@ void ofApp::draw(){
     gui.draw();
 }
 
+bool comparePair(pair<int, float> a, pair<int, float> b) {
+    return b.second < a.second;
+}
+
 //--------------------------------------------------------------
 float ofApp::calculateScaleForVideoToFitImage(LaserImage* img, LaserVideo* vid) {
     // We assume that img is larger than vid
@@ -127,8 +134,32 @@ float ofApp::calculateScaleForVideoToFitImage(LaserImage* img, LaserVideo* vid) 
     float leftI = img->hotspot.x;
     float topI = img->hotspot.y;
     float bottomI = img->baseHeight - img->hotspot.y;
-}
 
+    float rightV = vid->baseWidth - vid->hotspot.x;
+    float leftV = vid->hotspot.x;
+    float topV = vid->hotspot.y;
+    float bottomV = vid->baseHeight - vid->hotspot.y;
+    
+    vector<pair<char, float> > diffSizes;
+    float rightD = rightI / rightV;
+    float leftD = leftI / leftV;
+    float topD = topI / topV;
+    float bottomD = bottomI / bottomV;
+    pair<char, float> c = make_pair('r', rightD);
+    diffSizes.push_back(c);
+    c = make_pair('l', leftD);
+    diffSizes.push_back(c);
+    c = make_pair('t', topD);
+    diffSizes.push_back(c);
+    c = make_pair('b', bottomD);
+    diffSizes.push_back(c);
+    
+    sort(diffSizes.begin(), diffSizes.end(), comparePair);
+    
+    float scale = diffSizes[0].second;
+    
+    return scale;
+}
 
 //--------------------------------------------------------------
 void ofApp::onImageChanged(int & index) {
@@ -168,6 +199,8 @@ void ofApp::keyPressed(int key){
     if(key == ' ') {
         saveHotspots();
     }
+    
+    calculateScaleForVideoToFitImage(images[imageIndex], videos[videoIndex]);
 }
 
 //--------------------------------------------------------------
