@@ -17,10 +17,12 @@ void ofApp::setup(){
         images.push_back(img);
     }
     
-    gui.setup("Controls");
+    string settingsPath = "settings/masterSettings.xml";
+    gui.setup("Controls", settingsPath);
     gui.add(fade.set("Fade", 0, 0, 1));
     gui.add(fadeSpeed.set("Fade Speed", 0.1, 0.0, 1.0));
     gui.add(imageDuration.set("Image Duration", 5.0, 1.0, 30.0));
+    gui.loadFromFile(settingsPath);
     
     blend.load("shaders/blend");
     fadeShader.load("shaders/fade");
@@ -55,6 +57,7 @@ void ofApp::setup(){
         mixers[i].videos = &videos;
         mixers[i].blend = &blend;
         mixers[i].setup();
+        setRandomSettings(&(mixers[i]));
     }
     
     lastSwapTime = ofGetElapsedTimef();
