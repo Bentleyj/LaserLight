@@ -39,7 +39,7 @@
 <images>
     <ImagesPortrait002jpg>
         <hotspot>
-            <x>1523.333251953</x>
+            <x>1523.000000000</x>
             <y>1090.000000000</y>
         </hotspot>
     </ImagesPortrait002jpg>
@@ -75,8 +75,8 @@
     </ImagesPortrait006jpg>
     <ImagesLandscape002jpg>
         <hotspot>
-            <x>1793.000000000</x>
-            <y>1009.000000000</y>
+            <x>1792.495117188</x>
+            <y>1013.436462402</y>
         </hotspot>
     </ImagesLandscape002jpg>
     <ImagesLandscape003jpg>
@@ -93,8 +93,8 @@
     </ImagesLandscape001jpg>
     <ImagesLandscape015jpg>
         <hotspot>
-            <x>1675.000000000</x>
-            <y>993.000000000</y>
+            <x>1676.956787109</x>
+            <y>993.629882812</y>
         </hotspot>
     </ImagesLandscape015jpg>
     <ImagesLandscape014jpg>

@@ -64,23 +64,41 @@ void ofApp::update(){
     videos[videoIndex]->update();
     if(doMix) {
         videoScale = calculateScaleForVideoToFitImage(images[imageIndex], videos[videoIndex]);
+//        if(images[imageIndex]->getWidth() / ofGetWidth() > images[imageIndex]->getHeight() / ofGetHeight()) {
+//            scale = ofGetWidth() / images[imageIndex]->getWidth();
+//        } else {
+//            scale = ofGetHeight() / images[imageIndex]->getHeight();
+//        }
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     if(doMix) {
-        ofPushMatrix();
-        ofSetColor(255, 127);
-        ofScale(scale, scale);
-        images[imageIndex]->draw();
-        ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
-        ofTranslate(diff);
-        ofTranslate(videos[videoIndex]->hotspot);
-        ofScale(videoScale, videoScale);
-        ofTranslate(-1 * videos[videoIndex]->hotspot);
-        videos[videoIndex]->draw();
-        ofPopMatrix();
+//        ofPushMatrix();
+//        ofSetColor(255, 127);
+//        ofScale(scale, scale);
+//        images[imageIndex]->draw();
+//        ofVec2f diff = images[imageIndex]->hotspot - videos[videoIndex]->hotspot;
+//        ofTranslate(diff);
+//        ofTranslate(videos[videoIndex]->hotspot);
+//        ofScale(videoScale, videoScale);
+//        ofTranslate(-1 * videos[videoIndex]->hotspot);
+//        videos[videoIndex]->draw();
+//        ofPopMatrix();
+        blend.begin();
+        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
+        blend.setUniformTexture("vidTex", videos[videoIndex]->getTexture(), 1);
+        blend.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+        blend.setUniform2f("imgSize", images[imageIndex]->getWidth(), images[imageIndex]->getHeight());
+        blend.setUniform2f("vidSize", videos[videoIndex]->getWidth(), videos[videoIndex]->getHeight());
+        blend.setUniform2f("imgHotspot", images[imageIndex]->hotspot.x, images[imageIndex]->hotspot.y);
+        blend.setUniform2f("vidHotspot", videos[videoIndex]->hotspot.x, videos[videoIndex]->hotspot.y);
+        blend.setUniform1f("vidScale", videoScale);
+        blend.setUniform1f("scale", scale);
+        blend.setUniform2f("imageOffset", imageOffset.get().x, imageOffset.get().y);
+        ofDrawRectangle(0, 0, ofGetWidth() / scale, ofGetHeight() / scale);
+        blend.end();
     } else {
         ofPushMatrix();
         ofScale(scale, scale);
@@ -90,20 +108,13 @@ void ofApp::draw(){
         ofScale(videoScale, videoScale);
         videos[videoIndex]->draw();
         ofPopMatrix();
+
     }
 
     
     
 //    if(doMix) {
-//        blend.begin();
-//        blend.setUniformTexture("imgTex", images[imageIndex]->getTexture(), 0);
-//        blend.setUniformTexture("vidTex", videos[videoIndex]->getTexture(), 1);
-//        blend.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
-//        blend.setUniform1f("imgScale", imgScale);
-//        blend.setUniform1f("vidScale", vidScale);
-//        blend.setUniform2f("imgOffset", imageOffset.get().x, imageOffset.get().y);
-//        ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-//        blend.end();
+
 //    } else {
 //        if(showImg) {
 //            ofPushMatrix();

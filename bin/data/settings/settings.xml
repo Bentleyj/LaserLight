@@ -1,10 +1,19 @@
+<?xml version="1.0"?>
 <group>
 	<Image_Index>12</Image_Index>
 	<Video_Index>3</Video_Index>
-<group/>
+	<group />
 	<Image_Offset>-564.245, 125.388</Image_Offset>
 	<Img_Scale>0.255</Img_Scale>
 	<Vid_Scale>1</Vid_Scale>
 	<Show_Img>1</Show_Img>
 	<Do_Mix>1</Do_Mix>
 </group>
+<Controls>
+	<Image_Offset>0, 0</Image_Offset>
+	<Image_Index>0</Image_Index>
+	<Video_Index>0</Video_Index>
+	<Scale>0.21</Scale>
+	<Vid_Scale>1</Vid_Scale>
+	<Mix>0</Mix>
+</Controls>
