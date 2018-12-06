@@ -68,7 +68,7 @@ void ofApp::setup(){
     
     int nOutputs = 2;
     int nInputs = 2;
-//    ofSoundStreamSetup(nOutputs, nInputs, this);
+    ofSoundStreamSetup(nOutputs, nInputs, this);
     
     lastSwapTime = ofGetElapsedTimef();
     
@@ -84,12 +84,6 @@ void ofApp::update(){
         for(int i = 0; i < mixers.size(); i++) {
             mixers[i].videoIndex++;
             mixers[i].videoIndex %= mixers[i].videos->size();
-//            int frame = videos[mixers[i].videoIndex]->getCurrentFrame();
-//            int maxFrames = videos[mixers[i].videoIndex]->getTotalNumFrames();
-//            int step = 20;
-//            frame += step;
-//            frame %= maxFrames;
-//            videos[mixers[i].videoIndex]->setFrame(frame);
         }
         lastJumpTime = ofGetElapsedTimef();
     }
