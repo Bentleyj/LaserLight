@@ -33,6 +33,7 @@ void VimageMixer::setup() {
 //--------------------------------------------------------------
 void VimageMixer::update() {
     videoScale = calculateScaleForVideoToFitImage((*images)[imageIndex], (*videos)[videoIndex]);
+    (*videos)[videoIndex]->update();
 }
 
 //--------------------------------------------------------------
