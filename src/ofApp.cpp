@@ -68,7 +68,7 @@ void ofApp::setup(){
     
     int nOutputs = 2;
     int nInputs = 2;
-    ofSoundStreamSetup(nOutputs, nInputs, this);
+//    ofSoundStreamSetup(nOutputs, nInputs, this);
     
     lastSwapTime = ofGetElapsedTimef();
     
@@ -97,9 +97,10 @@ void ofApp::update(){
         mixers[i].update();
         mixers[i].novelty = ofMap(onsetNovelty, 0, maxOnset, 0, 1, true);
     }
-    for(int i = 0; i < videos.size(); i++) {
-        videos[i]->update();
-    }
+//    for(int i = 0; i < videos.size(); i++) {
+////        if(videos[i]->isP)
+////        videos[i]->update();
+//    }
     if(ofGetElapsedTimef() - lastSwapTime > imageDuration) {
         fadeTarget = int(fade.get()+1) % 2;
         lastSwapTime = ofGetElapsedTimef();
